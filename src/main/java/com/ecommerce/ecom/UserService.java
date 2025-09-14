@@ -1,32 +1,34 @@
 package com.ecommerce.ecom;
 
-import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    @Getter
-    private List<User> users =new ArrayList<>();
-    private Long nextId =  1L;
 
-    public List<User> createUsers(User user) {
-        user.setId(nextId++);
-        users.add(user);
-        return users;
+    private final UserRepository userRepository;
+
+    public List<User> getUsers() {
+        return userRepository.findAll();
+    }
+
+    public void createUsers(User user) {
+
+        userRepository.save(user);
     }
 
     public Optional<User> getUserById(Long id) {
-        return users.stream().filter(user -> user.getId().equals(id)).findFirst();
+        return userRepository.findById(id);
 
     }
 
     public boolean updateUsers(Long id, User updatedUser) {
-       return getUserById(id).map(user -> {user.setFirstName(updatedUser.getFirstName());user.setLastName(updatedUser.getLastName());return true;}).orElse(false);
+       return userRepository.findById(id).map(user -> {user.setFirstName(updatedUser.getFirstName()); user.setLastName(updatedUser.getLastName());userRepository.save(user); return true;}).orElse(false);
 
     }
 }
